@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>アドベンチャージャパン九十九里 収支</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+:root {
+  --bg: #EEF4F3; --surface: #FFFFFF; --fg: #12302F; --muted: #55706E; --line: #CFDEDC;
+  --in: #0B6E6C; --food: #C2511F; --bath: #8F6C0C; --fare: #6A4FA3; --other: #3F6C8F; --on: #FFFFFF;
+  --left-bg: #D5ECEA; --left-fg: #0A5553; --bad: #B3261E; --bad-bg: #FBE4E2; --warn-bg: #FFF1D6; --warn-fg: #7A5200;
+  --display: "Dela Gothic One", "Hiragino Kaku Gothic StdN", sans-serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1E1E; --surface: #182A2A; --fg: #E4F0EF; --muted: #9DB6B4; --line: #2E4545;
+  --in: #4CC4BE; --food: #F08A55; --bath: #E0BE5F; --fare: #B39BE8; --other: #86B4D8; --on: #0B1A1A;
+  --left-bg: #1D3F3E; --left-fg: #8FE0DB; --bad: #FF8A80; --bad-bg: #3D1F1D; --warn-bg: #3A2F14; --warn-fg: #F2CF80;
+  color-scheme: dark;
+} }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.7; word-break: auto-phrase; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 36px; }
+.nb { white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums; }
+header { display: grid; gap: 4px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(1.4rem, 4.6vw, 2rem); line-height: 1.35; margin: 0; text-wrap: balance; }
+.date { color: var(--muted); margin: 0; }
+h2 { font-size: 1.15rem; margin: 0; font-weight: 700; }
+section { display: grid; gap: 12px; min-width: 0; }
+.help { color: var(--muted); font-size: .9rem; margin: 0; }
+.verdict { display: grid; gap: 6px; }
+.verdict-label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-weight: 700; }
+.big { font-family: var(--display); font-size: clamp(2.5rem, 10vw, 3.75rem); line-height: 1.15; color: var(--left-fg); }
+.big.bad { color: var(--bad); }
+.pill { display: inline-block; padding: 1px 10px; border-radius: 99px; font-size: .8rem; font-weight: 700; white-space: nowrap; }
+.pill.good { background: var(--left-bg); color: var(--left-fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.verdict p { margin: 0; }
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 4.5em minmax(0, 1fr); gap: 10px; align-items: center; }
+.bar-name { font-weight: 700; font-size: .9rem; }
+.bar { display: flex; height: 46px; min-width: 0; }
+.seg { display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--on); font-size: .82rem; font-weight: 700; white-space: nowrap; min-width: 0; }
+.seg.in { background: var(--in); } .seg.food { background: var(--food); } .seg.fare { background: var(--fare); } .seg.other { background: var(--other); } .seg.bath { background: var(--bath); }
+.seg.left { background: var(--left-bg); color: var(--left-fg); }
+.ledger { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 4px 16px; }
+.led { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.led:last-child { border-bottom: 0; }
+.led.total { font-weight: 700; font-size: 1.1rem; }
+.sw { width: 12px; height: 12px; border-radius: 3px; align-self: center; }
+.sw.in { background: var(--in); } .sw.food { background: var(--food); } .sw.fare { background: var(--fare); } .sw.other { background: var(--other); } .sw.bath { background: var(--bath); } .sw.left { background: var(--left-fg); }
+.led small { color: var(--muted); display: block; font-weight: 400; font-size: .84rem; }
+.led .num { text-align: right; white-space: nowrap; }
+.scenario { background: var(--warn-bg); color: var(--warn-fg); border-radius: 8px; padding: 10px 14px; margin: 0; }
+.table { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; min-width: 0; }
+.row { display: grid; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.table > .row:last-child { border-bottom: 0; }
+.row.head { color: var(--muted); font-size: .8rem; font-weight: 700; padding-block: 6px; }
+.row.off > :not(.del) { opacity: .62; }
+.p-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr) 7em 5.2em 3.6em 3em; }
+.kid { display: flex; align-items: center; gap: 4px; font-size: .84rem; white-space: nowrap; cursor: pointer; }
+.kid input { width: auto; margin: 0; }
+.counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0; }
+.counts div { display: grid; gap: 0; }
+.counts dt { color: var(--muted); font-size: .84rem; }
+.counts dd { margin: 0; font-weight: 700; }
+.s-row { grid-template-columns: minmax(0, .9fr) 4em 7em minmax(0, 2.4fr) 3em; }
+.m-row { grid-template-columns: minmax(0, 1.5fr) 8.5em 7em 3em; }
+.row.head span { white-space: nowrap; }
+.o-row { grid-template-columns: minmax(0, 1fr) 7em 3em; }
+.r-row { grid-template-columns: minmax(0, 1.5fr) 6em 6em 7.5em 3em; }
+.b-row { grid-template-columns: minmax(0, 1.5fr) 6em 6em 7em 7em 3em; }
+input, select { font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: 5px 7px; width: 100%; min-width: 0; }
+input.n { text-align: right; font-variant-numeric: tabular-nums; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--in); outline-offset: 1px; }
+input.missing { border-color: var(--warn-fg); background: var(--warn-bg); }
+select option { color: #12302F; background: #FFFFFF; }
+.out { text-align: right; font-weight: 700; white-space: nowrap; }
+.note { grid-column: 1 / -1; color: var(--muted); font-size: .84rem; margin-top: -4px; }
+button { font: inherit; color: var(--fg); cursor: pointer; }
+.del { background: none; border: 1px solid transparent; border-radius: 5px; color: var(--muted); padding: 4px 0; font-size: .85rem; white-space: nowrap; }
+.del:hover { border-color: var(--line); }
+.del.armed { color: var(--bad); border-color: var(--bad); font-weight: 700; }
+.add { justify-self: start; background: var(--surface); border: 1px solid var(--in); color: var(--in); border-radius: 6px; padding: 5px 14px; font-weight: 700; font-size: .9rem; }
+.add:hover { background: var(--left-bg); }
+.empty { color: var(--muted); padding: 12px 0; margin: 0; font-size: .92rem; }
+.status { color: var(--muted); font-size: .85rem; min-height: 1.5em; margin: 0; }
+.notice { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 0; font-size: .9rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.reset { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 12px; font-size: .85rem; }
+@media (max-width: 620px) {
+  .row.head { display: none; }
+  .p-row { grid-template-columns: minmax(0, 1fr) 9em; }
+  .s-row { grid-template-columns: minmax(0, 1fr) 3.6em 6.6em; }
+  .s-row .memo { grid-column: 1 / 3; grid-row: 2; }
+  .s-row .del { grid-column: 3; grid-row: 2; justify-self: end; width: 3em; }
+  .m-row { grid-template-columns: minmax(0, 1fr) 5.6em; }
+  .m-row .del { justify-self: end; width: 3em; }
+  .p-row .del { justify-self: end; width: 3em; }
+  .o-row { grid-template-columns: minmax(0, 1fr) 6.6em 3em; }
+  .b-row { grid-template-columns: minmax(0, 1fr) 5.6em 5.6em; }
+  .row.b-row.head { display: grid; }
+  .row.b-row.head span:nth-child(n+4) { display: none; }
+  .b-row .del { justify-self: end; width: 3em; }
+  .r-row { grid-template-columns: minmax(0, 1fr) 5.6em 5.6em; }
+  .row.r-row.head { display: grid; }
+  .row.r-row.head span:nth-child(n+4) { display: none; }
+  .r-row .out { grid-column: 1 / 3; }
+  .r-row .del { justify-self: end; width: 3em; }
+  .row { border-bottom-width: 2px; }
+  .bar-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (prefers-reduced-motion: no-preference) { .seg { transition: width .2s ease; } }
+.sync { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; }
+.sync input { flex: 1 1 9em; min-width: 0; font: inherit; font-size: 16px; padding: 8px 10px; border: 1px solid #c9c2b3; border-radius: 8px; background: #fff; }
+.sync button { font: inherit; font-weight: 700; padding: 8px 14px; border: 0; border-radius: 8px; background: #1f6f8b; color: #fff; cursor: pointer; }
+.syncmsg { margin: 0 0 12px; font-size: .9rem; font-weight: 700; min-height: 1.2em; }
+.syncmsg.ok { color: #1e7a48; } .syncmsg.err { color: #b3261e; }
+.syncmsg button { font: inherit; font-size: .85rem; margin-left: 6px; padding: 3px 10px; border-radius: 6px; border: 1px solid #1f6f8b; background: #fff; color: #1f6f8b; cursor: pointer; }
+</style></head><body>
+<div class="wrap">
+  <p style="margin:0 0 8px"><a href="https://aj-staff.vercel.app/" style="font-weight:700;color:#1f6f8b">← スタッフ進行表へ</a></p>
+  <header>
+    <h1>アドベンチャージャパン九十九里 収支</h1>
+    <p class="date">2026年11月21日（土）〜23日（月・祝）</p>
+  </header>
+  <p class="notice" id="notice"><span id="noticeText">数字を書きかえて試算できます。スタッフの合言葉を入れると、書きかえがスタッフ全員の画面に反映されます。</span><button type="button" class="reset" id="reset">最初の数字に戻す</button></p>
+  <form class="sync" id="syncForm"><input id="syncName" placeholder="あなたの名前" autocomplete="nickname"><input id="syncPass" type="password" inputmode="numeric" placeholder="スタッフの合言葉" autocomplete="current-password"><button type="submit">みんなと共有する</button></form>
+  <p class="syncmsg" id="syncMsg" role="status" aria-live="polite"></p>
+  <div id="app" style="display:contents"></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+var INITIAL = {"baths": [{"adult": 700, "child": 350, "id": "b1", "label": "1日目 グロリア", "scope": "スタッフ"}, {"adult": 1350, "child": 720, "id": "b2", "label": "2日目 旭の湯", "scope": "全員", "ticket": {"price": 9800, "sheets": 10}}], "meals": [{"id": "m1", "label": "1日目 夜 お刺身・乾杯ビール", "unit": 1000}, {"id": "m2", "label": "2日目 夜 バーベキュー", "unit": 2000}, {"id": "m3", "label": "3日目 ピザ・コーヒー", "unit": 1000}], "others": [{"amount": 10000, "id": "o2", "label": "Wave使用料（お宿代）"}], "participants": [{"fee": 20000, "id": "p1", "name": "村上さん", "status": "決定", "type": "リピート"}, {"fee": 20000, "id": "p2", "name": "でいじろうさん", "status": "決定", "type": "リピート"}, {"fee": 25000, "id": "p3", "name": "冬野りくさん", "status": "決定", "type": "初参加"}, {"fee": 25000, "id": "p4", "name": "きゆかさん", "status": "決定", "type": "初参加"}, {"fee": 25000, "id": "p5", "name": "圭介さん", "status": "決定", "type": "初参加"}, {"fee": 10000, "id": "p6", "name": "みきさん", "status": "決定", "type": "特別割"}, {"fee": 20000, "id": "p7", "name": "えぐちさん", "note": "えぐちさん、ゆみさん、りんちゃんの3人分", "status": "決定", "type": "家族割（仮）"}, {"fee": 0, "id": "p8", "name": "ゆみさん", "note": "えぐちさんの20,000円に含む", "status": "決定", "type": "家族割（仮）"}, {"child": true, "fee": 0, "id": "p9", "name": "りんちゃん", "note": "5歳くらい。えぐちさんの20,000円に含む", "status": "決定", "type": "家族割（仮）"}, {"fee": null, "id": "p10", "name": "成澤啓太さん", "status": "未定", "type": "未定"}], "rains": [{"adult": 2200, "child": 900, "id": "r1", "label": "フリスポ佐原 3時間くらい", "note": "子供900円は仮です。下館店の未就学児（4〜6歳）3時間料金の高い方で、佐原店の料金は未確認です。"}], "staff": [{"fare": 38000, "id": "s1", "memo": "ガソリン18,000円＋高速10,000円×2（多め）", "name": "カルロス", "people": 1}, {"fare": 7000, "id": "s2", "memo": "ガソリン代 ざっくり（2人で7,000円）", "name": "まさお・メイ", "people": 2}, {"fare": 5000, "id": "s3", "memo": "ざっくり", "name": "りえちゃん", "people": 1}]};
+(function () {
+  var TYPES = ['リピート', '初参加', '特別割', '家族割（仮）', '未定'];
+  var AUTO_FEE = { 'リピート': 20000, '初参加': 25000 };
+  var KEY = 'aj-kujukuri-budget-v1';
+  var app = document.getElementById('app');
+  var statusEl = document.getElementById('status');
+  var state = null;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function num(v) { return Number(v) || 0; }
+  function yen(n) { return (n < 0 ? '−' : '') + Math.abs(n).toLocaleString('ja-JP') + '円'; }
+  function comma(v) { return v == null ? '' : Number(v).toLocaleString('ja-JP'); }
+  function parseNum(s) { var d = String(s).normalize('NFKC').replace(/[^0-9]/g, ''); return d === '' ? null : Number(d); }
+  function newId() { return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function sum(list, f) { return list.reduce(function (a, x) { return a + num(f(x)); }, 0); }
+
+  function bathCost(b, allAdults, kids, staffN) {
+    if (b.scope === 'スタッフ') return num(b.adult) * staffN;
+    return num(b.adult) * allAdults + num(b.child) * kids;
+  }
+  function rainCost(r, allAdults, kids) { return num(r.adult) * allAdults + num(r.child) * kids; }
+
+  function compute(s) {
+    var decided = s.participants.filter(function (p) { return p.status !== '未定'; });
+    var undecided = s.participants.filter(function (p) { return p.status === '未定'; });
+    var income = sum(decided, function (p) { return p.fee; });
+    var staffN = sum(s.staff, function (x) { return x.people; });
+    var adults = decided.filter(function (p) { return !p.child; }).length;
+    var kids = decided.length - adults;
+    var head = adults + staffN;
+    var unit = sum(s.meals, function (m) { return m.unit; });
+    var food = unit * head;
+    var fare = sum(s.staff, function (x) { return x.fare; });
+    var missing = s.staff.filter(function (x) { return x.fare == null; }).concat(s.others.filter(function (o) { return o.amount == null; }));
+    var other = sum(s.others, function (o) { return o.amount; });
+    var baths = s.baths || [];
+    var bath = sum(baths, function (b) { return bathCost(b, adults + staffN, kids, staffN); });
+    var bathAdult = sum(baths, function (b) { return b.scope === 'スタッフ' ? 0 : b.adult; });
+    var bathNote = baths.map(function (b) { return b.label + ' ' + (b.scope === 'スタッフ' ? 'スタッフ分' : '全員分'); }).join('、');
+    var ticketSave = baths.reduce(function (a, b) {
+      if (!b.ticket) return a;
+      return a + Math.max(0, num(b.adult) * b.ticket.sheets - b.ticket.price) * Math.floor((b.scope === 'スタッフ' ? staffN : adults + staffN) / b.ticket.sheets);
+    }, 0);
+    var expense = food + fare + other + bath;
+    return { adults_all: adults + staffN, bathNote: bathNote, bath: bath, bathAdult: bathAdult, ticketSave: ticketSave, fareMissing: s.staff.filter(function (x) { return x.fare == null; }).length, otherMissing: s.others.filter(function (o) { return o.amount == null; }).length, adults: adults, kids: kids, decided: decided, undecided: undecided, income: income, staffN: staffN, head: head, unit: unit, food: food, fare: fare, missing: missing, other: other, expense: expense, remain: income - expense };
+  }
+
+  function seg(cls, value, max, label) {
+    if (value <= 0 || max <= 0) return '';
+    var pct = value / max * 100;
+    return '<div class="seg ' + cls + '" style="width:' + pct + '%" title="' + esc(label + ' ' + yen(value)) + '">' + (pct >= 13 ? esc(cls === 'in' || pct < 24 ? label : label + ' ' + yen(value)) : '') + '</div>';
+  }
+
+  function summaryHtml(c) {
+    var over = c.remain < 0;
+    var pill = c.missing.length ? '<span class="pill warn">金額に未入力あり</span>'
+      : over ? '<span class="pill bad">赤字</span>' : '<span class="pill good">黒字</span>';
+    var rate = c.income > 0 ? Math.round(c.expense / c.income * 100) : 0;
+    var line = '参加費 <span class="nb num">' + yen(c.income) + '</span> から経費 <span class="nb num">' + yen(c.expense) + '</span> を引いた金額です。';
+    if (c.income > 0) line += '経費は参加費の<span class="nb num">' + rate + '%</span>です。';
+    if (c.missing.length) line += '金額が未入力の項目が' + c.missing.length + '件あり、0円で計算しています。';
+    var max = Math.max(c.income, c.expense, 1);
+    var scenarios = c.undecided.map(function (p) {
+      var low, high;
+      if (num(p.fee) > 0) { low = high = c.remain + num(p.fee) - c.unit - c.bathAdult; }
+      else { low = c.remain + 20000 - c.unit - c.bathAdult; high = c.remain + 25000 - c.unit - c.bathAdult; }
+      return '<p class="scenario">' + esc(p.name || '未定の人') + 'が参加すると、残りは<span class="nb num">' + (low === high ? yen(low) : yen(low) + '〜' + yen(high)) + '</span>になります。</p>';
+    }).join('');
+    var rainSec = (state.rains || []).map(function (r) {
+      var unknown = c.kids > 0 && r.child == null;
+      var cost = rainCost(r, c.head, c.kids);
+      var after = c.remain - cost;
+      return '<section><h2>雨の日の予算（未定）</h2><div class="ledger">' +
+        '<div class="led"><span class="sw in"></span><span>参加費</span><span class="num">' + yen(c.income) + '</span></div>' +
+        '<div class="led"><span class="sw food"></span><span>晴れの日と同じ経費</span><span class="num">' + yen(c.expense) + '</span></div>' +
+        '<div class="led"><span class="sw other"></span><span>' + esc(r.label) + '<small>大人' + c.head + '人 × ' + yen(num(r.adult)) + (unknown ? '。子供' + c.kids + '人分の料金は未入力' : '') + '</small></span><span class="num">' + yen(cost) + (unknown ? '＋子供分' : '') + '</span></div>' +
+        '<div class="led total"><span class="sw left"></span><span>雨の日の残り' + (after < 0 ? ' <span class="pill bad">赤字</span>' : '') + '</span><span class="num">' + yen(after) + (unknown ? ' 以下' : '') + '</span></div>' +
+        '</div><p class="help">全員分をこちらで出した場合です。雨の日に減る費用があれば、そこから変わります。</p></section>';
+    }).join('');
+    if (c.ticketSave > 0) scenarios += '<p class="scenario">旭の湯で回数券を使うと、お風呂代が<span class="nb num">' + yen(c.ticketSave) + '</span>安くなり、残りは<span class="nb num">' + yen(c.remain + c.ticketSave) + '</span>になります。</p>';
+    return '<section class="verdict" aria-label="いまの収支">' +
+      '<div class="verdict-label">いまの残り ' + pill + '</div>' +
+      '<div class="big num' + (over ? ' bad' : '') + '">' + yen(c.remain) + '</div>' +
+      '<p>' + line + '</p></section>' +
+      '<section><h2>入るお金と出るお金</h2>' +
+      '<div class="bars" role="img" aria-label="参加費' + yen(c.income) + '、経費' + yen(c.expense) + '、残り' + yen(c.remain) + '">' +
+        '<div class="bar-row"><div class="bar-name">参加費</div><div class="bar">' + seg('in', c.income, max, yen(c.income)) + '</div></div>' +
+        '<div class="bar-row"><div class="bar-name">経費</div><div class="bar">' + seg('food', c.food, max, '食費') + seg('fare', c.fare, max, '交通費') + seg('bath', c.bath, max, 'お風呂') + seg('other', c.other, max, 'その他') + seg('left', c.remain, max, '残り') + '</div></div>' +
+      '</div>' +
+      '<div class="ledger">' +
+        '<div class="led"><span class="sw in"></span><span>参加費<small>参加決定 ' + c.decided.length + '人' + (c.kids ? '（うち子供' + c.kids + '人）' : '') + '</small></span><span class="num">' + yen(c.income) + '</span></div>' +
+        '<div class="led"><span class="sw food"></span><span>食費<small>' + c.head + '人（参加者' + c.adults + '＋スタッフ' + c.staffN + '）× ' + yen(c.unit) + '</small></span><span class="num">' + yen(c.food) + '</span></div>' +
+        '<div class="led"><span class="sw fare"></span><span>スタッフ交通費' + (c.fareMissing ? '<small>未入力 ' + c.fareMissing + '件</small>' : '') + '</span><span class="num">' + yen(c.fare) + '</span></div>' +
+        '<div class="led"><span class="sw bath"></span><span>お風呂代<small>' + esc(c.bathNote) + '</small></span><span class="num">' + yen(c.bath) + '</span></div>' +
+        '<div class="led"><span class="sw other"></span><span>その他の経費<small>' + esc(state.others.map(function (o) { return o.label; }).join('、')) + (c.otherMissing ? '（未入力 ' + c.otherMissing + '件）' : '') + '</small></span><span class="num">' + yen(c.other) + '</span></div>' +
+        '<div class="led total"><span class="sw left"></span><span>残り</span><span class="num">' + yen(c.remain) + '</span></div>' +
+      '</div>' + scenarios + '</section>' + rainSec +
+      '<section><h2>人数の目安</h2><dl class="counts">' +
+        '<div><dt>全体（車の人数）</dt><dd>' + (c.decided.length + c.staffN) + '人</dd></div>' +
+        '<div><dt>食費の人数</dt><dd>' + c.head + '人</dd></div>' +
+        '<div><dt>お風呂の人数</dt><dd>大人' + c.head + '人' + (c.kids ? '、子供' + c.kids + '人' : '') + '</dd></div>' +
+      '</dl></section>';
+  }
+
+  function delBtn(list, id) { return '<button type="button" class="del" data-del="' + list + '" data-id="' + id + '" aria-label="この行を消す">消す</button>'; }
+  function textIn(list, r, key, label, cls) { return '<input type="text" class="' + (cls || '') + '" data-list="' + list + '" data-id="' + r.id + '" data-key="' + key + '" value="' + esc(r[key]) + '" aria-label="' + label + '">'; }
+  function numIn(list, r, key, label, cls) { return '<input type="text" inputmode="numeric" class="n ' + (cls || '') + '" data-list="' + list + '" data-id="' + r.id + '" data-key="' + key + '" data-num="1" value="' + comma(r[key]) + '" aria-label="' + label + '">'; }
+  function sel(list, r, key, opts, label) { return '<select data-list="' + list + '" data-id="' + r.id + '" data-key="' + key + '" aria-label="' + label + '">' + opts.map(function (o) { return '<option' + (o === r[key] ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select>'; }
+
+  function tablesHtml(s, c) {
+    var p = s.participants.map(function (r) {
+      return '<div class="row p-row' + (r.status === '未定' ? ' off' : '') + '">' + textIn('participants', r, 'name', '名前') + sel('participants', r, 'type', TYPES, '区分') + numIn('participants', r, 'fee', '参加費（円）') + sel('participants', r, 'status', ['決定', '未定'], '参加状況') + '<label class="kid"><input type="checkbox" data-list="participants" data-id="' + r.id + '" data-key="child"' + (r.child ? ' checked' : '') + '>子供</label>' + delBtn('participants', r.id) + (r.note ? '<div class="note">' + esc(r.note) + '</div>' : '') + '</div>';
+    }).join('');
+    var st = s.staff.map(function (r) {
+      return '<div class="row s-row">' + textIn('staff', r, 'name', '名前') + numIn('staff', r, 'people', '人数') + numIn('staff', r, 'fare', '交通費（円）', r.fare == null ? 'missing' : '') + textIn('staff', r, 'memo', 'メモ', 'memo') + delBtn('staff', r.id) + '</div>';
+    }).join('');
+    var m = s.meals.map(function (r) {
+      return '<div class="row m-row">' + textIn('meals', r, 'label', '食事') + numIn('meals', r, 'unit', '1人あたり（円）') + '<div class="out num" data-meal="' + r.id + '">' + yen(num(r.unit) * c.head) + '</div>' + delBtn('meals', r.id) + '</div>';
+    }).join('');
+    var o = s.others.map(function (r) {
+      return '<div class="row o-row">' + textIn('others', r, 'label', '項目') + numIn('others', r, 'amount', '金額（円）', r.amount == null ? 'missing' : '') + delBtn('others', r.id) + '</div>';
+    }).join('');
+    var b = (s.baths || []).map(function (r) {
+      return '<div class="row b-row">' + textIn('baths', r, 'label', 'お風呂') + numIn('baths', r, 'adult', '大人料金（円）') + numIn('baths', r, 'child', '子供料金（円）') + sel('baths', r, 'scope', ['全員', 'スタッフ'], '経費に入れる人') + '<div class="out num" data-bath="' + r.id + '">' + yen(bathCost(r, c.adults_all, c.kids, c.staffN)) + '</div>' + delBtn('baths', r.id) + '</div>';
+    }).join('');
+    var rn = (s.rains || []).map(function (r) {
+      return '<div class="row r-row">' + textIn('rains', r, 'label', '雨の日の案') + numIn('rains', r, 'adult', '大人料金（円）') + numIn('rains', r, 'child', '子供料金（円）', r.child == null ? 'missing' : '') + '<div class="out num" data-rain="' + r.id + '">' + yen(rainCost(r, c.head, c.kids)) + '</div>' + delBtn('rains', r.id) + (r.note ? '<div class="note">' + esc(r.note) + '</div>' : '') + '</div>';
+    }).join('');
+    return '<section><h2>参加者と参加費</h2><p class="help">区分でリピートか初参加を選ぶと、参加費が自動で入ります。状況を「未定」にすると計算から外れます。「子供」に印を付けると、食費の人数から外れ、車の人数には入ります。</p>' +
+        '<div class="table"><div class="row p-row head"><span>名前</span><span>区分</span><span>参加費（円）</span><span>状況</span><span></span><span></span></div>' + p + '</div>' +
+        '<button type="button" class="add" data-add="participants">参加者を追加</button></section>' +
+      '<section><h2>スタッフ交通費</h2><p class="help">人数は食費の計算に使います。スタッフの参加費はかかりません。</p>' +
+        '<div class="table"><div class="row s-row head"><span>名前</span><span>人数</span><span>交通費（円）</span><span>メモ</span><span></span></div>' + st + '</div>' +
+        '<button type="button" class="add" data-add="staff">スタッフを追加</button></section>' +
+      '<section><h2>食費</h2><p class="help">全員分の金額を自動で計算します。1日目の昼と2日目の行動食は各自なので、入れていません。</p>' +
+        '<div class="table"><div class="row m-row head"><span>食事</span><span>1人あたり（円）</span><span style="text-align:right">全員分</span><span></span></div>' + m + '</div>' +
+        '<button type="button" class="add" data-add="meals">食事を追加</button></section>' +
+      '<section><h2>お風呂代</h2><p class="help">料金は土日祝のものです。「経費に入れる人」を「スタッフ」にすると、参加者さんは各自負担になり、スタッフ分だけが経費に入ります。旭の湯の回数券は10枚で9,800円です。雨天の場合のかりんの湯は、120分で大人1,390円・小学生以下800円、フリータイムで大人1,980円・小学生以下1,080円です。</p>' +
+        '<div class="table"><div class="row b-row head"><span>お風呂</span><span>大人（円）</span><span>子供（円）</span><span>経費に入れる人</span><span style="text-align:right">経費</span><span></span></div>' + b + '</div>' +
+        '<button type="button" class="add" data-add="baths">お風呂を追加</button></section>' +
+      '<section><h2>雨の日の案（未定）</h2><p class="help">雨の日だけかかる費用なので、経費には入れていません。金額を変えると、上の雨の日の予算も変わります。</p>' +
+        '<div class="table"><div class="row r-row head"><span>案</span><span>大人（円）</span><span>子供（円）</span><span style="text-align:right">全員分</span><span></span></div>' + rn + '</div>' +
+        '<button type="button" class="add" data-add="rains">雨の日の案を追加</button></section>' +
+      '<section><h2>その他の経費</h2>' +
+        '<div class="table">' + (o || '<p class="empty">まだありません。宿泊費、会場費、保険などがあれば追加してください。</p>') + '</div>' +
+        '<button type="button" class="add" data-add="others">経費を追加</button></section>';
+  }
+
+  function render() {
+    var c = compute(state);
+    app.innerHTML = '<div id="summary" style="display:contents">' + summaryHtml(c) + '</div>' + tablesHtml(state, c);
+  }
+  function renderSummary() {
+    var c = compute(state);
+    document.getElementById('summary').innerHTML = summaryHtml(c);
+    app.querySelectorAll('[data-meal]').forEach(function (el) {
+      var m = state.meals.find(function (x) { return x.id === el.getAttribute('data-meal'); });
+      if (m) el.textContent = yen(num(m.unit) * c.head);
+    });
+    app.querySelectorAll('[data-rain]').forEach(function (el) {
+      var r = state.rains.find(function (x) { return x.id === el.getAttribute('data-rain'); });
+      if (r) el.textContent = yen(rainCost(r, c.head, c.kids));
+    });
+    app.querySelectorAll('[data-bath]').forEach(function (el) {
+      var b = state.baths.find(function (x) { return x.id === el.getAttribute('data-bath'); });
+      if (b) el.textContent = yen(bathCost(b, c.head, c.kids, c.staffN));
+    });
+  }
+
+  /* ===== みんなと共有（Supabase masao-hub・スタッフの合言葉） ===== */
+  var API = 'https://wmcnbrydcpffujcphmib.supabase.co/rest/v1/rpc/', SKEY = 'sb_publishable_t8LXZ9zsMDNurVaqlP7eaw_8eBfmWcK', DOC = 'aj-kujukuri-budget';
+  var PASS = '', ME = '', VER = null, shared = false, pushTimer = null, pushing = false, dirty = false;
+  var syncMsg = document.getElementById('syncMsg'), syncForm = document.getElementById('syncForm');
+  try { PASS = localStorage.getItem('aj-sync-pass') || ''; ME = localStorage.getItem('aj-sync-name') || ''; } catch (e) {}
+  function msg(t, c) { syncMsg.className = 'syncmsg ' + (c || ''); syncMsg.textContent = t; }
+  function rpc(fn, body) {
+    var ctl = new AbortController(), tm = setTimeout(function () { ctl.abort(); }, 15000);
+    return fetch(API + fn, { method: 'POST', headers: { 'apikey': SKEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal })
+      .then(function (r) { clearTimeout(tm); if (!r.ok) return r.text().then(function (x) { var e = new Error(x); e.bad = /bad pass/.test(x); e.missing = r.status === 404; throw e; }); return r.json(); });
+  }
+  function busy() { var a = document.activeElement; return a && app.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'SELECT'); }
+  function adopt(d) { state = d.body; VER = d.ver; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} render(); }
+  function push() {
+    if (!shared) return;
+    if (pushing) { dirty = true; return; }
+    pushing = true; dirty = false; msg('みんなに送っています…');
+    rpc('aj_doc_put', { p_pass: PASS, p_id: DOC, p_body: state, p_ver: VER, p_by: ME || null }).then(function (r) {
+      pushing = false;
+      if (r.ok) { VER = r.ver; msg('✓ みんなに反映しました', 'ok'); if (dirty) push(); }
+      else { adopt(r); msg('ほかの人（' + (r.by || 'スタッフ') + '）が先に直していたので、最新を読み込みました。もう一度入力してください', 'err'); }
+    }, function (e) { pushing = false; msg(e && e.bad ? '合言葉がちがいます' : '送れませんでした（電波？）。この端末には残っています', 'err'); });
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); localStorage.setItem(KEY + '-edited', '1'); } catch (e) {}
+    if (shared) { clearTimeout(pushTimer); pushTimer = setTimeout(push, 900); statusEl.textContent = ''; }
+    else statusEl.textContent = 'この端末に保存しました（合言葉を入れるとみんなに反映されます）。';
+  }
+  function pull() {
+    if (!shared || pushing || busy() || pushTimer && dirty) return;
+    rpc('aj_doc_get', { p_pass: PASS, p_id: DOC }).then(function (d) { if (d && d.ver !== VER && !busy()) { adopt(d); msg('✓ ' + (d.by || 'スタッフ') + 'さんの変更を反映しました', 'ok'); } }, function () {});
+  }
+  function connect(first) {
+    msg('つないでいます…');
+    return rpc('aj_doc_get', { p_pass: PASS, p_id: DOC }).then(function (d) {
+      shared = true;
+      try { localStorage.setItem('aj-sync-pass', PASS); if (ME) localStorage.setItem('aj-sync-name', ME); } catch (e) {}
+      syncForm.style.display = 'none';
+      document.getElementById('noticeText').textContent = '書きかえると、スタッフ全員の画面に数秒で反映されます。';
+      document.getElementById('reset').textContent = 'みんなの最新を読み直す';
+      var edited = false; try { edited = localStorage.getItem(KEY + '-edited') === '1' && !localStorage.getItem(KEY + '-synced'); } catch (e) {}
+      var mine = state;
+      if (!d) { VER = null; push(); }
+      else {
+        adopt(d);
+        if (edited && JSON.stringify(mine) !== JSON.stringify(d.body)) {
+          syncMsg.className = 'syncmsg err';
+          syncMsg.innerHTML = 'この端末だけで入力していた内容があります。いまはみんなの版を表示しています。<button type="button" id="useMine">この端末の内容をみんなの版にする</button>';
+          document.getElementById('useMine').onclick = function () { if (this.dataset.armed) { state = mine; render(); push(); } else { this.dataset.armed = '1'; this.textContent = '本当に（みんなの版が上書きされます）'; } };
+        } else msg('✓ みんなと共有しています', 'ok');
+      }
+      try { localStorage.setItem(KEY + '-synced', '1'); } catch (e) {}
+      setInterval(function () { if (!document.hidden) pull(); }, 6000);
+    }, function (e) {
+      if (e && e.bad) { try { localStorage.removeItem('aj-sync-pass'); } catch (_) {} msg('合言葉がちがいます', 'err'); }
+      else if (e && e.missing) msg('共有の準備がまだです。この端末だけに保存します', 'err');
+      else msg('つながりません（電波？）。この端末だけに保存します', 'err');
+    });
+  }
+  syncForm.addEventListener('submit', function (e) { e.preventDefault(); PASS = document.getElementById('syncPass').value.trim(); ME = document.getElementById('syncName').value.trim(); if (PASS) connect(true); });
+
+  function findRow(el) { return state[el.getAttribute('data-list')].find(function (r) { return r.id === el.getAttribute('data-id'); }); }
+  app.addEventListener('input', function (e) {
+    var el = e.target;
+    if (!el.getAttribute || !el.getAttribute('data-key') || el.tagName === 'SELECT' || el.type === 'checkbox') return;
+    var r = findRow(el); if (!r) return;
+    var key = el.getAttribute('data-key');
+    r[key] = el.getAttribute('data-num') ? parseNum(el.value) : el.value;
+    if (key === 'fare' || key === 'amount') el.classList.toggle('missing', r[key] == null);
+    renderSummary(); save();
+  });
+  app.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.type === 'checkbox') { var cr = findRow(el); if (cr) { cr[el.getAttribute('data-key')] = el.checked; render(); save(); } return; }
+    if (el.tagName !== 'SELECT') return;
+    var r = findRow(el); if (!r) return;
+    var key = el.getAttribute('data-key');
+    r[key] = el.value;
+    if (key === 'type' && AUTO_FEE[el.value]) r.fee = AUTO_FEE[el.value];
+    render(); save();
+  });
+  app.addEventListener('focusout', function (e) {
+    var el = e.target;
+    if (el.getAttribute && el.getAttribute('data-num')) { var r = findRow(el); if (r) el.value = comma(r[el.getAttribute('data-key')]); }
+    if (el.classList && el.classList.contains('armed')) { el.classList.remove('armed'); el.textContent = '消す'; }
+  });
+  app.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t.getAttribute('data-del')) {
+      if (!t.classList.contains('armed')) { t.classList.add('armed'); t.textContent = '本当に'; return; }
+      var list = t.getAttribute('data-del'), id = t.getAttribute('data-id');
+      state[list] = state[list].filter(function (r) { return r.id !== id; });
+      render(); save();
+    } else if (t.getAttribute('data-add')) {
+      var name = t.getAttribute('data-add'), row = { id: newId() };
+      if (name === 'participants') { row.name = ''; row.type = '初参加'; row.fee = 25000; row.status = '決定'; }
+      if (name === 'staff') { row.name = ''; row.people = 1; row.fare = null; row.memo = ''; }
+      if (name === 'meals') { row.label = ''; row.unit = null; }
+      if (name === 'baths') { row.label = ''; row.adult = null; row.child = null; row.scope = '全員'; }
+      if (name === 'rains') { row.label = ''; row.adult = null; row.child = null; }
+      if (name === 'others') { row.label = ''; row.amount = null; }
+      state[name].push(row);
+      render(); save();
+      var first = app.querySelector('[data-id="' + row.id + '"]'); if (first) first.focus();
+    }
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    if (shared) { rpc('aj_doc_get', { p_pass: PASS, p_id: DOC }).then(function (d) { if (d) { adopt(d); msg('✓ みんなの最新を読み直しました', 'ok'); } }, function () { msg('読み直せませんでした（電波？）', 'err'); }); return; }
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    state = JSON.parse(JSON.stringify(INITIAL)); render(); statusEl.textContent = '最初の数字に戻しました。';
+  });
+
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  state = saved && Array.isArray(saved.participants) ? saved : JSON.parse(JSON.stringify(INITIAL));
+  render();
+  if (PASS) { document.getElementById('syncName').value = ME; connect(false); }
+})();
+</script>
+</body></html>
